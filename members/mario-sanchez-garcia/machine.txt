@@ -1,5 +1,5 @@
 github_user: mario-sanchez-garcia
-laptop: MacBook Pro, macOS
+laptop: Apple MacBook Pro 14-inch Nov 2023 M3, macOS Sonoma 14.2
 date: 2026-10-27 16:08 UTC
 cpus_in_container: 8
 architecture: aarch64
