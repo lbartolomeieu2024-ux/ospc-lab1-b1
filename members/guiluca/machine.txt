@@ -1,0 +1,10 @@
+github_user: guiluca
+laptop: laptop model, operating system
+date: 2026-10-27 16:09 UTC
+cpus_in_container: 16
+architecture: x86_64
+cpu: AuthenticAMD AMD Ryzen 7 8845HS w/ Radeon 780M Graphics 
+kernel: 6.6.114.1-microsoft-standard-WSL2
+docker_memory_kb: 7745612
+container_memory_limit: 2147483648
+container_swap_limit: 0
