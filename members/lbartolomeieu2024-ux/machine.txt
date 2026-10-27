@@ -1,0 +1,10 @@
+github_user: lbartolomeieu2024-ux
+laptop: Samsung 940XGK (Intel Core Ultra 7 155H, 16 cores, 22 threads), Windows 11 Pro
+date: 2026-10-27 15:59 UTC
+cpus_in_container: 22
+architecture: x86_64
+cpu: GenuineIntel Intel(R) Core(TM) Ultra 7 155H 
+kernel: 6.18.33.2-microsoft-standard-WSL2
+docker_memory_kb: 4006072
+container_memory_limit: 2147483648
+container_swap_limit: 0
