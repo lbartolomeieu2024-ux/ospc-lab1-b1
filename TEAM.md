@@ -1,19 +1,13 @@
-# Team
+﻿# Team
 
-Blackboard team:
+Blackboard team: b1
 
-One row per member. Write each GitHub username with an `@` in front of it, for
-example `@octocat`: `tools/check.py` reads the usernames from this table.
-
-Where to find each detail (Section 3 of the handout has the same table):
-
-| Detail | Mac | Windows |
-|---|---|---|
-| GitHub username | On github.com, click your picture at the top right: the name in bold | Same |
-| Laptop model and operating system | Apple menu → About This Mac | Press the Windows key, type System Information, open it: System Manufacturer, System Model, OS Name |
-| Cores and threads | About This Mac → More Info → System Report → Hardware: Total Number of Cores (Apple chips run one thread per core) | System Information, Processor line: Core(s) and Logical Processor(s); the logical processors are the threads |
-| CPUs in the container | Run `nproc` in the container | Same |
-
-| Name | GitHub username | Laptop (model, operating system) | Cores and threads of the laptop | CPUs in the container (`nproc`) |
+| Name | GitHub username | Laptop (model, operating system) | Cores and threads of the laptop | CPUs in the container (
+proc) |
 |---|---|---|---|---|
-| | | | | |
+| Lucía Bartolomé Gómez | @lbartolomeieu2024-ux | Samsung 940XGK, Windows 11 Pro | 16 cores, 22 threads | 22 |
+| Guilherme Lucarelli Monteiro de Oliveira | @guiluca | ASUS Vivobook S 14 M5406UA, Windows 11 Home | 8 cores, 16 threads | 16 |
+| Irene García Palacios | @igarciapieu2024-oss | Acer Swift SF16-51, Windows 11 Home | 8 cores, 8 threads | (completar) |
+| Mario Sánchez García | @mario-sanchez-garcia | Apple MacBook Pro 14-inch Nov 2023 M3, macOS Sonoma 14.2 | 8 cores, 8 threads | 8 |
+| Pablo Esteves | @pestevesieu2024-jpg | Apple MacBook Pro 13-inch M1 2020, macOS Tahoe 26.6.2 | 8 cores (4 performance + 4 efficiency), 8 threads | 8 |
+| Salim Cherraj | @saL1mZzz | Apple MacBook Air M2 2022, macOS Tahoe 26.6.2 | 8 cores, 8 threads | (completar) |
