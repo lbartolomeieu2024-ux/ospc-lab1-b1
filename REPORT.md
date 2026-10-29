@@ -56,7 +56,7 @@ not whole screens.
 | Profile (sample): strptime | 100,000 calls, 1.197 s | 0 |
 | check.py segments.csv | — | PASS |
 
-The step is 3× faster (78.9 s less user time). But peak memory grows because the whole date column is converted at once, plus temporary arrays, but it stays below the 2 GiB limit. The fix trades memory for time. 
+The step is faster (78.9 s less user time). But peak memory grows because the whole date column is converted at once, plus temporary arrays, but it stays below the 2 GiB limit. The fix trades memory for time. 
 
 ## Task 5: Computing the statistics
 
