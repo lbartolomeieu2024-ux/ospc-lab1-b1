@@ -71,11 +71,20 @@ The step is faster (78.9 s less user time). But peak memory grows because the wh
 
 ## Task 5: Computing the statistics
 
-- Symptom:
-- Commands and recordings you used, why you chose them, and what they showed:
-- Cause:
-- Fix:
-- Before and after (your measurements):
+- Symptom: More workers did not make stats.sh faster, and after Ctrl-C the workers kept running. On my laptop (8 CPUs in the container) the default of 16 workers was slower than 8 workers, and after Ctrl-C ps -ef still listed python3 steps/stats_worker.py processes.
+- Commands and recordings you used, why you chose them, and what they showed: (1) bash tools/sweep.sh mario-sanchez-garcia, to time the step with 1, 2, 4, 8 and 16 workers, three runs each. The mean elapsed time fell from about 51 s (1 worker) to 26 s (2), 13.6 s (4) and 9.0 s (8), and then rose to about 10.1 s with 16 workers; user and system CPU time also grew. (2) timeout --foreground -s INT 3 bash steps/stats.sh followed by ps -ef | grep stats_worker | grep -v grep: timeout sends SIGINT after 3 s, like Ctrl-C, so the test does not depend on my timing. It showed many stats_worker processes still alive with PPID 1.
+- Cause: WORKERS defaulted to a fixed 16, whatever the laptop. With more workers than CPUs (8) the processes compete for the CPUs and the kernel switches between them: system time rose from 3.4 s to 4.2 s and user time from 61 s to 71 s, so 16 workers were slower than 8. The workers are started with & and the script neither kept their PIDs nor handled signals: Ctrl-C (SIGINT) ended the script, but the background workers kept running and were adopted by the process with PID 1.
+- Fix: Two commits. (1) WORKERS=${WORKERS:-$(nproc)}: one worker per CPU that the container sees. (2) The script stores the PID of every worker (pids+=($!)) and has a trap on INT and TERM that runs kill "${pids[@]}", waits for them and exits with status 130, so Ctrl-C leaves nothing running.
+- Before and after (your measurements): mean of 3 runs on my laptop.
+
+| | Before (16 workers) | After (8 workers = nproc) |
+|---|---|---|
+| Elapsed | 10.06 s | 9.03 s |
+| User | 70.6 s | 61.1 s |
+| System | 4.16 s | 3.38 s |
+| stats_worker alive after Ctrl-C | yes, PPID 1 | none |
+| check.py stats.csv | - | PASS (72 region-months) |
+
 
 ## The worker experiment
 
