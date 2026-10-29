@@ -6,8 +6,8 @@ not whole screens.
 
 ## Warm-up: Generating the report
 
-- What happened, and why:
-- Your fix, and how it reached your teammates:
+- What happened, and why: ./run_report.sh failed with 'Permission denied'. ls -l run_report.sh showed -rw-r--r--: the execute permission (x) was missing for the owner, the group and everyone else, so the kernel refused to run the file directly. bash run_report.sh works because bash only needs to read the file (r) and runs it as its own input, without executing the file itself.
+- Your fix, and how it reached your teammates: I ran chmod +x run_report.sh in the container (the mode changed to -rwxr-xr-x), then committed the mode change on my laptop ('Make run_report.sh executable') and pushed it. On macOS and Linux git tracks the executable bit, so my teammates got the fix with git pull.
 
 ## Task 1: Generating the report… again
 
