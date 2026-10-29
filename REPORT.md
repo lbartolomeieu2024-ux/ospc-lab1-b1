@@ -46,6 +46,7 @@ not whole screens.
   - added after `read_csv`: `orders["quarter"] = pd.to_datetime(orders["order_date"], format="%Y-%m-%d").dt.quarter`
   - replaced the `strptime` line in `segment` with: `quarter = order.quarter`
 - Before and after (your measurements):
+
 | | Before | After |
 |---|---|---|
 | Sample: elapsed / user / system | 4.75 / 2.86 / 0.97 s | 2.09 / 1.64 / 0.34 s |
