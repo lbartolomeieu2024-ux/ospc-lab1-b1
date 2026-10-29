@@ -19,11 +19,22 @@ not whole screens.
 
 ## Task 2: Extracting data
 
-- Symptom:
-- Commands and recordings you used, why you chose them, and what they showed:
-- Cause:
-- Fix:
+- Symptom: `bash steps/extracts.sh` printed `extracts: done` and exited with 0 in 0.05 s, but all six files in `~/data/out/extracts` were 0 bytes.
+- Commands and recordings you used, why you chose them, and what they showed: `less steps/extracts.sh` to read what the script does. Then I ran its pipeline by hand, from the folder it works in and without `2>/dev/null`: `cd ~/data/out/extracts; grep ",Iberia," ../data/sales_2025.csv | cut -d, -f1,2,4,6,7 | wc -l` printed `grep: ../data/sales_2025.csv: No such file or directory` and `0`. `echo ${PIPESTATUS[@]}` printed `2 0 0`, and `pwd` showed `/home/analyst/data/out/extracts`. No recordings: the error message and the exit statuses were enough.
+- Cause: the script does `cd "$OUT/extracts"` and then reads `../data/sales_2025.csv`. From that folder this means `/home/analyst/data/out/data/sales_2025.csv`, which does not exist (the script also ignores `DATA`). `grep` fails with status 2, but `2>/dev/null` hides its message, the status of the pipeline is the status of its last command (`cut`, 0), and the script never checks statuses, so it ends with `echo "extracts: done"` and exit status 0. The files exist but are empty because the shell creates each `$region.csv` for the redirection before running the commands.
+- Fix: added `set -euo pipefail`, read the input from `"$DATA"` (default `$HOME/data/sales_2025.csv`, like the other steps), removed `2>/dev/null`, and removed the `cd`, writing to `$OUT/extracts/$region.csv`, so the step works from any folder. With `pipefail`, `grep` would also stop the script if a region had no orders (status 1), but every region has orders.
 - Before and after (your measurements):
+
+| | Before | After |
+|---|---|---|
+| Full: elapsed / user / system | 0.05 / 0.01 / 0.04 s | 4.08 / 4.95 / 1.10 s |
+| Full: peak memory | 6,564 KB | 8,576 KB |
+| Rows in the six files | 0 | 8,400,000 |
+| Input missing (`DATA=/tmp/nope.csv`) | `extracts: done`, exit 0 | grep error, exit 2, no `done` |
+| Started from `~` | — | `extracts: done`, exit 0 |
+| `check.py` extracts | 6 × FAIL | 6 × PASS |
+
+The step now takes 4 s because it actually reads the 8.4 million orders. User time is higher than elapsed because `grep` and `cut` run at the same time, on two cores.
 
 ## Task 3: Auditing
 
@@ -79,6 +90,9 @@ Every member runs `tools/sweep.sh` on their own laptop. Then run
 - Which default number of workers did you choose for `stats.sh`, and why?
 
 ## Use of generative AI
+
+Pablo Esteves (pestevesieu2024-jpg): I relied on Anthropic’s Claude to help walk me through the environment setup, the class exercises, and debugging steps/extracts.sh. Typical queries I used were practical questions like "lets do my part: extracts" and troubleshooting errors such as "why do i get access denied". Claude produced the updated code for steps/extracts.sh (which I explicitly flagged via an in-file comment). For Task 2, I provided Claude with my raw data/measurements to generate the initial draft, which I then thoroughly reviewed and edited myself.
+
 
 Follow the format in the syllabus: quote any generated text and name the tool
 and the prompts; add the same note as a comment before any generated code. If
