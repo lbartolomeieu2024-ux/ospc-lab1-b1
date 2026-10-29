@@ -1,4 +1,5 @@
 #!/bin/bash
+# GenAI: this fix was written with Claude (Anthropic), see REPORT.md.
 # One file per region for the regional managers, with the columns
 # order_id, order_date, product_category, quantity, unit_price.
 set -euo pipefail
