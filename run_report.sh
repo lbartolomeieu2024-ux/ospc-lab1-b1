@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 # Nightly revenue report for the 2025 orders.
 # Run it from the repository folder: ./run_report.sh
 
