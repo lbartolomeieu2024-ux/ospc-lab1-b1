@@ -1,4 +1,5 @@
 #!/bin/bash
+# Generated with GenAI (Claude, Anthropic): prompt "how do I make a bash script stop when a step fails", suggested set -euo pipefail
 set -euo pipefail
 # Nightly revenue report for the 2025 orders.
 # Run it from the repository folder: ./run_report.sh
