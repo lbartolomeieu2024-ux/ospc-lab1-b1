@@ -141,5 +141,4 @@ Salim Cherraj (saL1mZzz): I used OpenAI's ChatGPT (GPT-6) as a step-by-step tuto
 
 Guilherme Oliveira (guiluca): I used chatgpt 5.6 sol to understand the instructions of the lab, troubleshoot any problems and errors that I had and guide me with the necessary commits and requirements of the lab activity. I was responsible for fixing the "audit.py" code and I used chatgpt to first understand the code line by line, which allowed me to spot the problem/inefficiency and fix it myself)
 
-Irene García: 
-I used Claude Anthropic, model Claude Opus 5.5 as a study tutor for this lab. I used it to guide me in the setup of the lab, explain the concepts behind each fault, to check if the interpretation of the outputs of my own measurements were correct, to explain line by line the coding, and correct the code I suggested to fix, and to review the wording of this report, to correct grammar mistakes. 
+Irene García (igarciapieu2024-oss): I used Claude Anthropic, model Claude Opus 5.5 as a study tutor for this lab. I used it to guide me in the setup of the lab, explain the concepts behind each fault, to check if the interpretation of the outputs of my own measurements were correct, to explain line by line the coding, and correct the code I suggested to fix, and to review the wording of this report, to correct grammar mistakes. 
