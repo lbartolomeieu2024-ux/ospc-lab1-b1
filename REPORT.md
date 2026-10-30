@@ -37,11 +37,31 @@ The step now takes 4 s because it actually reads the 8.4 million orders. User ti
 
 ## Task 3: Auditing
 
-- Symptom:
-- Commands and recordings you used, why you chose them, and what they showed:
-- Cause:
-- Fix:
-- Before and after (your measurements):
+- **Symptom:** The audit step took 237.51 seconds to process 8.4 million orders because, for every row, the output file was opened, written to, and closed, creating significant overhead.
+
+- **Commands and recordings used, why we chose them, and what they showed:**
+  - `/usr/bin/time -f "$T" python3 steps/audit.py` — Measured execution time, CPU time (user and system), and peak memory. It showed that almost half (49.3%) of CPU time was spent in the kernel.
+  - `DATA=~/data/sales_2025_sample.csv strace -c -e trace=openat,write,close python3 steps/audit.py` — Counted file-related system calls on 100,000 orders. Before the fix, there were 100,691 `openat`, 100,001 `write`, and 100,677 `close` calls, confirming excessive file operations.
+  - `python3 tools/check.py` — Verified that the optimized script produced the correct output, returning `PASS audit_2025.csv` with 8.4 million lines.
+  - No process recordings were made; we used timing measurements and `strace`.
+
+- **Cause:** The `with open(path, "a")` statement was inside the loop, causing the file to be opened and closed for every order. This prevented effective buffering because Python flushed its buffer every time the file was closed, generating unnecessary system calls.
+
+- **Fix:** Moved `with open(path, "w") as f:` outside the loop, opening the file only once and keeping it open while writing all orders. This allows Python to buffer multiple lines before making write system calls.
+
+- **Before and after (our measurements):**
+
+  | Metric | Before | After |
+  |---|---:|---:|
+  | Elapsed time (8.4M orders) | 237.51 s | 14.14 s |
+  | User CPU time | 119.24 s | 13.56 s |
+  | System CPU time | 116.15 s | 1.52 s |
+  | Peak memory | 633,932 KB | 633,680 KB |
+  | `openat` calls (100K orders) | 100,691 | 692 |
+  | `write` calls (100K orders) | 100,001 | 17 |
+  | `close` calls (100K orders) | 100,677 | 678 |
+
+  **Result:** The optimized script was approximately **16.8 times faster**, reducing elapsed time by 94%. The number of traced system calls decreased by 99.54%, while memory usage remained almost unchanged. The final output passed the correctness check.
 
 ## Task 4: Segmenting the orders
 
