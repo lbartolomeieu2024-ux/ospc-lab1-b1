@@ -72,3 +72,32 @@ Peak memory increases approximately linearly with the number of orders. Based on
    Estimated write calls = 1,952,269 / 131,072 = 14.9.
 
    Therefore, approximately **15 write calls** would be needed instead of 100,001 if the file were kept open and writes were buffered.
+
+
+
+
+### Task 6 — Auditing fix
+
+**Symptom:** The audit step took 237.51 seconds to process 8.4 million orders.
+
+**Diagnosis:** `strace` showed 301,369 traced system calls for just 100,000 orders, including approximately 100,000 file-opening and file-closing calls.
+
+**Cause:** The script opened and closed the output file for every order, preventing effective use of Python's file buffering.
+
+**Fix:** Moved `with open(path, "w") as f:` outside the loop, so the file is opened once and all orders are written through the same buffered file object.
+
+**Measurements:**
+
+| Metric | Before | After |
+|---|---:|---:|
+| Full dataset elapsed (s) | 237.51 | 14.14 |
+| User CPU time (s) | 119.24 | 13.56 |
+| System CPU time (s) | 116.15 | 1.52 |
+| Peak memory (KB) | 633932 | 633680 |
+| Sample openat calls | 100691 | 692 |
+| Sample write calls | 100001 | 17 |
+| Sample close calls | 100677 | 678 |
+
+**Result:** After the fix, execution became approximately 16.8 times faster, with a 94.0% reduction in elapsed time. The number of traced system calls decreased by 99.54%.
+
+**Correctness:** `tools/check.py` confirmed `PASS audit_2025.csv` with all 8,400,000 expected lines.
