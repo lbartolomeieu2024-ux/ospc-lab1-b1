@@ -138,3 +138,5 @@ used in this assignment."
 Luc? Bartolom?G?ez (lbartolomeieu2024-ux): I used Claude (Anthropic, claude.ai) to explain exit statuses, signals and `strace` output. For the `run_report.sh` fix I asked "how do I make a bash script stop when a step fails", and Claude suggested the line `set -euo pipefail`, which I added after the shebang and marked with a comment in the file.
 
 Salim Cherraj (saL1mZzz): I used OpenAI's ChatGPT (GPT-6) as a step-by-step tutor to understand the lab instructions, troubleshoot terminal errors, and interpret my results. I uploaded the lab handout and screenshots of my terminal outputs. ChatGPT helped explain file permissions, Git commands, exit status 137, the OOM killer, memory usage, and output buffering with tee. 
+
+Guilherme Oliveira (guiluca): I used chatgpt 5.6 sol to understand the instructions of the lab, troubleshoot any problems and errors that I had and guide me with the necessary commits and requirements of the lab activity. I was responsible for fixing the "audit.py" code and I used chatgpt to first understand the code line by line, which allowed me to spot the problem/inefficiency and fix it myself)
