@@ -36,3 +36,39 @@ Peak memory increases approximately linearly with the number of orders. Based on
 **The exit status of the full pipeline is 0 as explained in answer 2&#x20;**
 
 **The detailed pipeline gives us 2,0,0 as the grep fails due to the wrong path but the other commands go through**
+
+## Section 5.4 — Task 3: Auditing
+
+### Performance measurements
+
+| Dataset          | Elapsed (s) | User (s) | System (s) | Peak memory (KB) |
+| ---------------- | ----------: | -------: | ---------: | ---------------: |
+| 100,000 orders   |        3.75 |     2.98 |       1.64 |           127364 |
+| 8,400,000 orders |      237.51 |   119.24 |     116.15 |           633932 |
+
+### Questions
+
+1. For 100,000 orders, `strace` reported:
+
+   - openat: 100,691 calls
+   - write: 100,001 calls
+   - close: 100,677 calls
+   - Total: 301,369 system calls
+
+   There are so many system calls because the script opens, writes to, and closes the output file for every individual order instead of keeping it open throughout the process.
+
+2. For the full dataset, system time was 116.15 seconds and user time was 119.24 seconds.
+
+   System CPU percentage = 116.15 / (119.24 + 116.15) × 100 = **49.3%**.
+
+   Almost half the CPU time is spent in the kernel, mainly because of repeated file operations.
+
+3. Closing a file after each line does not guarantee that the data is physically stored on disk. It flushes Python's buffer to the operating system, but the kernel may still hold the data in its page cache.
+
+4. The sample file with 100,000 orders is 1,952,269 bytes.
+
+   Python's buffer size is 128 KiB = 131,072 bytes.
+
+   Estimated write calls = 1,952,269 / 131,072 = 14.9.
+
+   Therefore, approximately **15 write calls** would be needed instead of 100,001 if the file were kept open and writes were buffered.
