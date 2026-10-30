@@ -13,9 +13,11 @@ orders = pd.read_csv(DATA, usecols=["order_id", "region", "quantity", "unit_pric
 orders["revenue"] = orders["quantity"] * orders["unit_price"]
 
 open(path, "w").close()
-for order in orders.itertuples():
-    # Open and close the file for every order, so that each line is
-    # saved on disk even if the job crashes halfway.
-    with open(path, "a") as f:
+with open(path, "w") as f:
+    for order in orders.itertuples():
         f.write(f"{order.order_id},{order.region},{order.revenue:.2f}\n")
+  # now instead of opening the file, writing and close the file for every single line,
+  # we keep the file open, write write write until the buffer is full, it is then
+  # flushed by the OS and writen to output file (not directly after flushing though;
+  # may take some time.
 print(f"audit: {len(orders):,} lines written")
