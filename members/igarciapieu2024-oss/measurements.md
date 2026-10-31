@@ -241,4 +241,14 @@ cat steps/segments.py
 ```
 # Task 5: Computing statistics. 
 
-1) A parallel program divides the work into workers, that each with their own core perform a task at the same time. So when we have more workers we can execute more tasks at the same time and therefore is faster. The problem is when the amount of workers is above the number of cores your laptop has. When that happens the worker need to take turns to use the core, which leads to no extra space, context switch and also cold cache (breaks cache affinity). In this case  stats.sh splits the work (the regions and months) among several workers. 
+1) A parallel program divides the work into workers, that each with their own core perform a task at the same time. So when we have more workers we can execute more tasks at the same time and therefore is faster. The problem is when the amount of workers is above the number of cores your laptop has. When that happens the worker need to take turns to use the core performing time sharing, which leads to no extra space, context switch and also cold cache (breaks cache affinity).
+In my laptop, when as the number of workers increased the elapsed time decreased however, when it reached more than 8 workers it started to shrink the extra speed of the previous workers, because know the workers have to take turns when using the cores, which leads to context switch costs, cache affinity and also that lose of extra speed.
+
+We also have to take into account the number of threads that it has. In hardware the number of threads indicate how many workers it can have in a core at the same time. When you have number of cores = number of threads, then per core you have a thread, meaning that the core can only have one worker at a time. When cores < number of threads, a core can have more than one thread, meaning that it can have 2 workers at the same time inside a core. When number of workers is lower than the number of threads, having more than one thread in the core saves the context switch time, if there are more workers than threads it again does time sharing.
+- That two workers share a core, does not add computing power, only avoids the elapse time to get worse.
+
+The curve between our laptops differ because of the relationship of workers, cores and threads. When the workers > cores, but workers < or equal to number of threads, each core holds 2 workers at a time (one worker per hardware thread) so the OS does not have to do time sharing and context switch. Both workers share the same core, so it does not add computational power, but the elapsed time stops decreasing. 
+
+3) Every process has a PID (process number) and PPID (number of the process parent)
+
+```
