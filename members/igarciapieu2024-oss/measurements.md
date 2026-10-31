@@ -165,7 +165,9 @@ ls -l ~/data/out/audit_2025.csv
 unset DATA
 
 # Task 4: Segmenting. 
+When we run first segment we can see that the elapsed time is large, and the user time is much longer than the system time, meaning that is using CPU time inside the code program not in the kernel. Therefore to locate the function that is being called the most in Python we use cProfile, not longer strace, that measures the number of functions in Python. By doing it we can see that there were for 100,000 orders 3,646,598 function calls. By identifying visualizing the code we could see that in the function segments at very order it convert the text into date with srptime (row by row in the loop, as segment function is inside the for loop) instead of converting the whole column at once. Wiithout the fix and using pandas per order it repeats 10 Python functions for the setup, while pandas does everything in a single call. 
 
+But we must be aware that there is a tradeoff as the peak memory grows because now the whole column is converted at once.
 - Results in the terminal
 ```
 T='%e s elapsed, %U s user, %S s system, %M KB peak memory'
