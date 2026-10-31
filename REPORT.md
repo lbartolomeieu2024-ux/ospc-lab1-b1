@@ -7,7 +7,7 @@ not whole screens.
 ## Warm-up: Generating the report
 
 - Team comparison (saL1mZzz): On my laptop, ./run_report.sh worked immediately. ls -l run_report.sh showed -rwxr-xr-x, meaning execute permission was already enabled for the owner, group and others. On Pablo's laptop, the permissions were -rw-r--r--, so running the script directly returned "Permission denied". The difference was the missing execute (x) permission on his copy. He fixed it using chmod +x run_report.sh. The executable-bit change was subsequently committed and shared through Git.
-
+-Also, on a Mac, it stores r/w/x Linux permission for every file so when cloning the repo, git created run_report.sh with the permissions saved in the repo. But for other team members since they have Windows it does not store r/w/x permissions, it has its own permission system. The repo folder is a Windows folder and Windows has no r/w/x permissions, so when the container looks at the folder, every file is shown as rwxrwxrwx.
 ## Task 1: Generating the report… again
 
 - Symptom: `./run_report.sh` printed `Nightly report finished` with exit status 0, although `report.py` had been killed (`Killed`, status 137). The steps after it ran anyway.
