@@ -170,13 +170,14 @@ When we run first segment we can see that the elapsed time is large, and the use
 But we must be aware that there is a tradeoff as the peak memory grows because now the whole column is converted at once.
 - Results in the terminal
 ```
+#The results were after the fix but in the Report you can see what was previosuly. 
 T='%e s elapsed, %U s user, %S s system, %M KB peak memory'
 /usr/bin/time -f "$T" python3 steps/segments.py
 	segments: done
 	24.49 s elapsed, 23.08 s user, 1.51 s system, 1177272 KB peak memory
 
 DATA=~/data/sales_2025_sample.csv python3 -m cProfile -s tottime steps/segments.py > /tmp/profile.txt
-head -n 25 /tmp/profile.txt
+head -n 25 /tmp/profile.txt #As it is after the fix the number of function calls and time has decreased although the peak memory increased. Also stripr does not longer appear
 		1152310 function calls (1139930 primitive calls) in 1.629 seconds
 	   Ordered by: internal time
 	   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
@@ -199,6 +200,41 @@ head -n 25 /tmp/profile.txt
 	139656/138967    0.013    0.000    0.013    0.000 {built-in method builtins.len}
 	  932/921    0.013    0.000    0.093    0.000 {built-in method builtins.__build_class__}
 	      442    0.012    0.000    0.101    0.000 <frozen importlib._bootstrap_external>:509(_compile_bytecode)
+cat steps/segments.py
+		"""Number of orders per region, quarter and order size (segments.csv)."""
+	
+	import os
+	from datetime import datetime
+	
+	import pandas as pd
+	
+	DATA = os.environ.get("DATA", os.path.expanduser("~/data/sales_2025.csv"))
+	OUT = os.environ.get("OUT", os.path.expanduser("~/data/out"))
+	os.makedirs(OUT, exist_ok=True)
+	
+	orders = pd.read_csv(DATA, usecols=["order_date", "region", "quantity", "unit_price"])
+	orders["quarter"] = pd.to_datetime(orders["order_date"], format="%Y-%m-%d").dt.quarter #code corrected now it converts the whole column at once with the tradeoff of peak memory
+	
+	
+	def segment(order):
+	    quarter = order.quarter #code corrected, does not longer do this in the loop 
+	    value = order.quantity * order.unit_price
+	    if value >= 500:
+	        size = "large"
+	    elif value >= 100:
+	        size = "medium"
+	    else:
+	        size = "small"
+	    return f"Q{quarter} {size}"
 
+	
+	counts = {}
+	for order in orders.itertuples(index=False):
+	    key = (order.region, segment(order))
+	    counts[key] = counts.get(key, 0) + 1
+	
+	table = pd.Series(counts).rename_axis(["region", "segment"]).unstack(fill_value=0)
+	table.to_csv(os.path.join(OUT, "segments.csv"))
+	print("segments: done")
 ```
 	
