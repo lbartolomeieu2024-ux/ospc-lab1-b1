@@ -30,7 +30,7 @@ analyst@ospc:~/work/ospc-lab1-b1$ bash run_report.sh
 # Task 1: Generating the Report. 
 - Questions
 1) Exit status 137 means that the program was stopped by a SIGKILL 9  (137-128), not by the program itself. SIGKILL cannot be caught, so report.py could not print an error or write its output file. The signal was sent by the kernel out of memory killer because the cgroup reached its memory limit. The line omm_kill in memory.events confirms it. The line max 485 shows the group reached its limit 485 times before the kill. 
-2) Because the printed table 2GB counts only for the final table, while the peak memory counts for everything the process is holding at the same time. 
+2) Because the printed table counts only the final table, while the peak memory counts for everything the process is holding at the same time. What really matters is the peak memory which was above the 2GB limit, making the process to be killed by the kernel, as the kernel could not free up more space.
 3) Table with number orders, size of the table and the peak memory, and how much memory the whole file would need 
 The Peak Memory grows linearly, in 1 million = 106Mib the Peak is 504856Mib, 2 million 211MiBm the Peak is 856508, which makes a difference of 351,652. For 4 million= 423MiB, which has a peak of 1568312, which makes a difference of 711804, divided by 2 is 355902. So we can estimate that the peak memory grows around 350,000 KB each 1 million orders more, so Peak in 8.4Million to be 1568,312 (peak in 4 million orders) + 4.4 * 355,902 = 3,134,000 KB approx. 
 
@@ -239,4 +239,6 @@ cat steps/segments.py
 	table.to_csv(os.path.join(OUT, "segments.csv"))
 	print("segments: done")
 ```
-	
+# Task 5: Computing statistics. 
+
+1) A parallel program divides the work into workers, that each with their own core perform a task at the same time. So when we have more workers we can execute more tasks at the same time and therefore is faster. The problem is when the amount of workers is above the number of cores your laptop has. When that happens the worker need to take turns to use the core, which leads to no extra space, context switch and also cold cache (breaks cache affinity). In this case  stats.sh splits the work (the regions and months) among several workers. 
