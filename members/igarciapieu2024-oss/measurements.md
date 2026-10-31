@@ -165,3 +165,38 @@ ls -l ~/data/out/audit_2025.csv
 unset DATA
 
 # Task 4: Segmenting. 
+
+- Results in the terminal
+```
+T='%e s elapsed, %U s user, %S s system, %M KB peak memory'
+/usr/bin/time -f "$T" python3 steps/segments.py
+	segments: done
+	24.49 s elapsed, 23.08 s user, 1.51 s system, 1177272 KB peak memory
+
+DATA=~/data/sales_2025_sample.csv python3 -m cProfile -s tottime steps/segments.py > /tmp/profile.txt
+head -n 25 /tmp/profile.txt
+		1152310 function calls (1139930 primitive calls) in 1.629 seconds
+	   Ordered by: internal time
+	   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+	     2180    0.428    0.000    0.428    0.000 {built-in method posix.stat}
+	   200514    0.185    0.000    0.185    0.000 array.py:818(__iter__)
+	        1    0.122    0.122    1.629    1.629 segments.py:1(<module>)
+	      442    0.089    0.000    0.089    0.000 {built-in method marshal.loads}
+	        1    0.083    0.083    0.088    0.088 c_parser_wrapper.py:203(read)
+	   100000    0.050    0.000    0.050    0.000 segments.py:16(segment)
+	   100138    0.049    0.000    0.070    0.000 __init__.py:453(_make)
+	   108779    0.033    0.000    0.033    0.000 {method 'get' of 'dict' objects}
+	    68/37    0.033    0.000    0.299    0.008 {built-in method _imp.exec_dynamic}
+	       68    0.029    0.000    0.029    0.000 {built-in method _imp.create_dynamic}
+	        7    0.025    0.004    0.032    0.005 string_arrow.py:195(_from_sequence)
+	      448    0.018    0.000    0.018    0.000 {method 'read' of '_io.BufferedReader' objects}
+	104488/104295    0.017    0.000    0.021    0.000 {built-in method __new__ of type object at 0xa99760}
+	      887    0.017    0.000    0.018    0.000 <frozen importlib._bootstrap_external>:137(_path_split)
+	      444    0.016    0.000    0.016    0.000 {built-in method _io.open_code}
+	       68    0.016    0.000    0.016    0.000 {built-in method posix.listdir}
+	139656/138967    0.013    0.000    0.013    0.000 {built-in method builtins.len}
+	  932/921    0.013    0.000    0.093    0.000 {built-in method builtins.__build_class__}
+	      442    0.012    0.000    0.101    0.000 <frozen importlib._bootstrap_external>:509(_compile_bytecode)
+
+```
+	
