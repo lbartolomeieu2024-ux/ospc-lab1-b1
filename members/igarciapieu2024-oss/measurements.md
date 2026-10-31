@@ -5,6 +5,7 @@
 3) On a Mac, it stores r/w/x Linux permission for every file. When they cloned the repo, git created run_report.sh with the permissions saved in the repo. On Windows it does not store r/w/x permissions, it has its own permission system. The repo folder is a Windows folder and Windows has no r/w/x permissions, so when the container looks at the folder, every file is shown as rwxrwxrwx. That is why in my Windows computer both commands worked.
 
 - Results in my terminal:
+```
 analyst@ospc:~/work/ospc-lab1-b1$ ./run_report.sh
 	Nightly report started: 07:36:13
 	extracts: done
@@ -25,7 +26,7 @@ analyst@ospc:~/work/ospc-lab1-b1$ bash run_report.sh
 	stats: input ready
 	stats: done with 16 workers
 	Nightly report finished: 07:49:28
-
+```
 # Task 1: Generating the Report. 
 - Questions
 1) Exit status 137 means that the program was stopped by a SIGKILL 9  (137-128), not by the program itself. SIGKILL cannot be caught, so report.py could not print an error or write its output file. The signal was sent by the kernel out of memory killer because the cgroup reached its memory limit. The line omm_kill in memory.events confirms it. The line max 485 shows the group reached its limit 485 times before the kill. 
@@ -43,6 +44,7 @@ The Peak Memory grows linearly, in 1 million = 106Mib the Peak is 504856Mib, 2 m
 4) Because report.py’s output does not go to the terminal: it goes through a pipe as the input of tee. When output goes to a pipe, Python buffers it and only writes it out when the buffer is full or the program ends normally. (On a terminal, it writes each line immediately.) The short loaded line was still waiting in report.py’s buffer when the OOM killer sent SIGKILL. SIGKILL cannot be caught, so the program had no chance to write out its buffer. The line never reached the tee, so it is missing from both the screen and the log. 
 
 - Results in my terminal:
+```
 python3 steps/report.py
 echo $?
 	report: loaded 8,400,000 orders (887 MiB)
@@ -75,7 +77,7 @@ DATA=/tmp/orders_1m.csv OUT=/tmp /usr/bin/time -f "$T" python3 steps/report.py
 
 python3 steps/report.py | tee /tmp/report.log
 cat /tmp/report.log #nothing because of what explained in Step 4
-
+```
 # Task 2: Extracting Data. 
 - Questions
 1) The file is empty because grep has been reading a non-existing directory that was previously changed by cd. When doing ../data/sales_2025.csv. 
@@ -99,7 +101,7 @@ grep fails with status 2 because pipefail makes the pipeline’s status 2 instea
 Therefore to make extracts.sh stop with an error I would have used set -eo pipefail
 
 - Results in the terminal
-
+```
 bash steps/extracts.sh
 echo $?
 ls -l ~/data/out/extracts
@@ -135,7 +137,7 @@ cd -
 	2 0 0
 	/home/analyst/data/out/extracts
 	/home/analyst/work/ospc-lab1-b1
-
+```
 # Task 3: Auditing. 
 
 - Questions
@@ -151,7 +153,7 @@ What close() does guarantee is that the line survives if the process is killed (
 The buffer is 128 KiB = 128 × 1,024 = 131,072 bytes. Each line is about 21.5 bytes (180,634,390 bytes ÷ 8,400,000 lines), so the 100,000-order sample file is about 2,150,000 bytes: 2,150,000 ÷ 131,072 = approx 16.4 → about 17 write calls, instead of ~100,000.
 
 - Results in the terminal
-
+```
 export DATA=~/data/sales_2025_sample.csv
 /usr/bin/time -f "$T" python3 steps/audit.py
 unset DATA
@@ -163,7 +165,7 @@ export DATA=~/data/sales_2025_sample.csv
 strace -c -e trace=openat,write,close python3 steps/audit.py
 ls -l ~/data/out/audit_2025.csv
 unset DATA
-
+```
 # Task 4: Segmenting. 
 When we run first segment we can see that the elapsed time is large, and the user time is much longer than the system time, meaning that is using CPU time inside the code program not in the kernel. Therefore to locate the function that is being called the most in Python we use cProfile, not longer strace, that measures the number of functions in Python. By doing it we can see that there were for 100,000 orders 3,646,598 function calls. By identifying visualizing the code we could see that in the function segments at very order it convert the text into date with srptime (row by row in the loop, as segment function is inside the for loop) instead of converting the whole column at once. Wiithout the fix and using pandas per order it repeats 10 Python functions for the setup, while pandas does everything in a single call. 
 
