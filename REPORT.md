@@ -112,10 +112,54 @@ Every member runs `tools/sweep.sh` on their own laptop. Then run
 
 ![Elapsed time against the number of workers](results/sweep.png)
 
-- How does the elapsed time change with the number of workers on each laptop?
-- Why do the curves of your laptops differ? Use the cores and threads of each
-  laptop, listed in `TEAM.md`.
-- Which default number of workers did you choose for `stats.sh`, and why?
+### How does elapsed time change with the number of workers?
+
+The table shows median elapsed time in seconds across three runs, matching results/sweep.png.
+
+| Member | 1 worker | 2 workers | 4 workers | 8 workers | 16 workers |
+|---|---:|---:|---:|---:|---:|
+| Guilherme | 43.22 | 28.87 | 18.75 | 16.85 | 16.44 |
+| Irene | 99.95 | 60.47 | 23.97 | 15.18 | 15.66 |
+| Lucía | 63.67 | 39.38 | 26.74 | 19.36 | 15.64 |
+| Mario | 50.70 | 26.06 | 13.52 | 9.05 | 10.01 |
+| Pablo | 35.70 | 18.93 | 12.22 | 9.75 | 10.58 |
+| Salim | 38.28 | 23.40 | 21.16 | 22.54 | 22.12 |
+
+Guilherme and Lucía had their lowest median at 16 workers, the largest count tested. Guilherme gained little between 8 and 16 workers. Irene, Mario and Pablo were fastest at 8 workers and slightly slower at 16. Salim was fastest at 4 workers; using 8 or 16 did not improve the median.
+
+Salim's results varied substantially between repetitions: at 4 workers, elapsed times were 9.83, 25.59 and 21.16 seconds. We retain all observations and avoid treating small differences as definitive. The measurements do not identify the cause of this variability.
+
+### Why do the laptop curves differ?
+
+The hardware counts below come from TEAM.md; container CPU counts come from the machine records used by the plotting script.
+
+| Member | Physical cores | Hardware threads | CPUs in container |
+|---|---:|---:|---:|
+| Guilherme | 8 | 16 | 16 |
+| Irene | 8 | 8 | 8 |
+| Lucía | 16 | 22 | 22 |
+| Mario | 8 | 8 | 8 |
+| Pablo | 8 | 8 | 8 |
+| Salim | 8 | 8 | 4 |
+
+More workers allow more tasks to execute concurrently, but the benefit depends on available CPU resources. Hardware threads sharing a core do not provide the same resources as separate physical cores. Processor speed, performance/efficiency core design, memory behavior, serial preparation work and system conditions also affect elapsed time.
+
+The observed curves broadly match container CPU availability: the 8-CPU containers performed best at 8 workers, while Salim's 4-CPU container performed best at 4. Guilherme's 16-CPU container improved up to 16, with diminishing gains. Lucía's container exposes 22 CPUs, but the experiment tested only up to 16 workers, so it does not establish her optimum.
+
+More workers than available CPUs can add scheduling and resource contention without adding execution capacity. CPU counts alone do not explain every timing difference or fluctuation.
+
+### Which default worker count did we choose, and why?
+
+The script uses:
+
+WORKERS=${WORKERS:-$(nproc)}
+
+This defaults to the processing units available to the process, while allowing an explicit WORKERS override. It adapts to each container instead of using a fixed 16 workers everywhere.
+
+For Salim, it selects 4 workers despite the Mac having 8 physical cores, because the container exposes only 4 CPUs. The measured medians support this choice on his container and the team's 8-CPU containers.
+
+This is a practical default, not a guarantee of the fastest setting for every machine. In particular, the sweep did not test Lucía's default of 22 workers.
+
 
 ## Use of generative AI
 Follow the format in the syllabus: quote any generated text and name the tool
