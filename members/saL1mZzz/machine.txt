@@ -1,6 +1,6 @@
 github_user: saL1mZzz
-laptop: laptop model, operating system
-date: 2026-10-27 16:18 UTC
+laptop: Apple MacBook Air (Mac14,2), M2, 8 cores (4 performance + 4 efficiency), 8 logical CPUs, macOS 26.6.2
+date: 2026-11-01 00:57 UTC
 cpus_in_container: 4
 architecture: aarch64
 cpu: Apple - 
